@@ -158,10 +158,9 @@ transform_iso_gene <- function(gene_list, expr_threshold = 0, ...) {
     return(to_return)
 }
 
-#' N-of-1-\emph{pathways} Mahalanobis distance (MD) Calculation
+#' Transforms gene-level distances into a pathway enrichment profiles
 #'
-#' \code{compute_nof1_md} computes N-of-1-\emph{pathways} Mahalanobis distance (MD)
-#' statistic, direction, and P-value for a pathway (Schissler et al. 2015).
+#' \code{transform_gene_pathway} computes odds ratios afits a mixture model to 
 #'
 #' @details This function enables gene set (pathway) testing for a single pathway while providing a context-meaningful effect size. In the original publication by Schissler et al. 2015, the P-value was produced via a nonparametric bootstrapping procedure. However, in later yet unpublished studies, it has been determined that a simple paired \emph{t}-test performs as well and much faster. Therefore the \emph{t}-test has been implemented. For a nonparametric approach use N-of-1-\emph{pathways} Wilcoxon for Gardeux et al. 2014.
 #' 
@@ -174,21 +173,15 @@ transform_iso_gene <- function(gene_list, expr_threshold = 0, ...) {
 #' and p_value. P_value is computed via a t.test.
 #' 
 #' @references
+#' #' Efron, B. (2013). “Local False Discovery Rates,” in Large-Scale Inference doi:10.1017/cbo9780511761362.006
+#' 
+#' Schissler, A. Grant, et al. "A single-subject method to detect pathway enriched with alternatively spliced genes." Frontiers in Genetics, to appear, (2019)
 #' Gardeux, Vincent, et al. "'N-of-1-\emph{pathways}' unveils personal deregulated mechanisms from a single pair of RNA-Seq samples: towards precision medicine." Journal of the American Medical Informatics Association 21.6 (2014): 1015-1025.
 #' 
 #' Schissler, A. Grant, et al. "Dynamic changes of RNA-sequencing expression for precision medicine: N-of-1-\emph{pathways} Mahalanobis distance within pathways of single subjects predicts breast cancer survival." Bioinformatics 31.12 (2015): i293-i302.
 #'
 #' @seealso \code{link{compute_nof1_wilcoxon}}, \code{link{compute_nof1_pathways}}, \code{link{compute_multi_nof1_pathways}}
 #'
-#' @examples
-#' ## compute N-of-1-pathways MD for a single pathway
-#' set.seed(44)
-#' N <- 10
-#' gene1 <- stats::rchisq(N, 5)
-#' gene2 <- stats::rchisq(N, 5)
-#' md_res <- compute_nof1_md(gene1, gene2)
-#' print(md_res)
-#' 
 #' @export
 transform_gene_pathway <- function(gene_dist, annot_file, desc_file = NULL, genes_range = c(15, 500), fdr_threshold = 0.2, plot_locfdr = 0, small_ontology = TRUE, custom_locfdr = FALSE, ...) {
 
@@ -222,7 +215,7 @@ transform_gene_pathway <- function(gene_dist, annot_file, desc_file = NULL, gene
     ## 2. Quantify enrichment using locfdr
 
     ## 2.1 Cluster genes
-    gene_clusters <- kmeans(x = gene_dist, 2)
+    gene_clusters <- stats::kmeans(x = gene_dist, 2)
     dist_data <- data.frame(gene_dist, call = 0)
         
     ## determine which cluster has larger center
@@ -238,7 +231,7 @@ transform_gene_pathway <- function(gene_dist, annot_file, desc_file = NULL, gene
         
     ## detect outlying pathways above prior to fitting
     fil_odds <- odds_ratio[!is.na(odds_ratio)]
-    outliers <- boxplot.stats(fil_odds)$out
+    outliers <- grDevices::boxplot.stats(fil_odds)$out
     if (length(outliers) > 0) fil_odds <- fil_odds[!(names(fil_odds) %in% names(outliers))]
 
     ## 2.2 Fit mixture model using locfdr package
@@ -252,7 +245,7 @@ transform_gene_pathway <- function(gene_dist, annot_file, desc_file = NULL, gene
     } else {
         if (small_ontology) {
             ## or use the small ontology customizations
-            if (use_sd_mlests) {mlests <- c(1, sd(fil_odds))}
+            if (use_sd_mlests) {mlests <- c(1, stats::sd(fil_odds))}
             suppressWarnings(tmp_locfdr <- locfdr::locfdr(zz = fil_odds, bre = ceiling(length(fil_odds)/bre), df = df, pct = pct, pct0 = pct0, nulltype = nulltype, plot = plot_locfdr, mlests = mlests))
         } else {
             ## or use the program defaults, suitable for large ontologies (> 1000)
@@ -286,7 +279,7 @@ transform_gene_pathway <- function(gene_dist, annot_file, desc_file = NULL, gene
     ## 4. add pathway descriptions
     to_return$pathway_desc <- "N/A"
     if (!is.null(desc_file)) {
-        desc_data <- read.delim2(file = desc_file, stringsAsFactors = F)
+        desc_data <- utils::read.delim2(file = desc_file, stringsAsFactors = F)
         rownames(desc_data) <- desc_data[, id_column]
         ## check that scored pathways have annotation
         if (any(rownames(to_return) %in% desc_data$path_id)) {
