@@ -1,12 +1,12 @@
 Package: n1pas
-Title: What the Package Does (One Line, Title Case)
+Title: An R Package for N-of-1-pathways Alternatively Spliced
 Version: 0.0.0.9000
 Authors@R: 
-    person(given = "First",
-           family = "Last",
+    person(given = "Alfred",
+           family = "Schissler",
            role = c("aut", "cre"),
-           email = "first.last@example.com")
-Description: What the package does (one paragraph).
+           email = "aschissler@unr.edu")
+Description: This R package provides functions, data, and tutorials to detect genetic pathways enriched with alternatively spliced genes. This analysis takes two paired RNA-seq samples and pathway annotations as inputs. And provides a ranked list of pathways enriched with alternatively spliced genes, along with effect sizes and uncertainty quantification.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
