@@ -12,7 +12,7 @@ blah
 
 ## Overview
 
-<img src="workflow_diagram.jpg" title="plot of chunk workflow_jpg" alt="plot of chunk workflow_jpg" width="700" />
+<img src="vignettes/workflow_diagram.jpg" title="plot of chunk workflow_jpg" alt="plot of chunk workflow_jpg" width="700" />
 
 ## Installation
 
