@@ -70,20 +70,6 @@ In gene set (i.e, pathway) analysis genes are annotated into functional groups t
 
 From a practical standpoint, the format required is a 'long' structure. A tab-delimited text file is expected with pathway ID as the first variable and the HUGO gene symbol as the second.
 
-```{r read_gene_set}
-## An example of how to read in a pathway definitions.
-## kegg_annot <- read_gene_set(file.path(my_path,"inst/extdata/PID_filtered15-X.txt"))
-head(kegg_annot)
-```
-
-It is often useful to include pathway descriptions in the output of the <span style="color:purple">N-of-1-*pathways*</span> framework. The format is very similar to above, but with the second variable indicated the pathway description - not pathway membership.
-
-```{r read_gene_desc}
-## note that read_gene_set reads both gene set definitions and descriptions
-## pid_desc <- read_gene_set(file.path( my_path, "inst/extdata/PID_description.txt"))
-head(kegg_desc)
-```
-
 ## Step 3: Compute pathway dysregulation profiles
 
 Now that the gene expression data and pathway annotation steps are complete, the actual calculation of pathway differential expression and statistical significance can be performed. Again, the details of the methods are provided in the references below and outside of the scope of this document.
@@ -94,8 +80,8 @@ Often, a clinician or researcher *a priori* selects pathways of interest to stud
 
 ```{r pathway_scores}
 ## Run and store Nof1-pathways Mahalanobis distance for the 4 pairs of data.
-annot_file <- file.path(my_path,"inst/extdata/kegg_tb.txt")
-desc_file <- file.path(my_path,"inst/extdata/kegg.description_tb.txt")
+annot_file <- file.path(my_path, "inst/extdata/kegg_tb.txt")
+desc_file <- file.path(my_path, "inst/extdata/kegg.description_tb.txt")
 iso_data <- blca_patient_iso_kegg
 
 enrichment_profile <- compute_n1pas(iso_data = iso_data, annot_file = annot_file, desc_file = desc_file, iso_range = c(2,30), genes_range = c(15,500), small_ontology = TRUE, plot_locfdr = 1)
