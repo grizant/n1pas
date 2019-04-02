@@ -4,23 +4,13 @@
 #'
 #' @details This function provides the Hellinger distance between two samples.
 #' This distance is used to quantify differential isoform usage.
-#' PROVIDE FORMULA
 #' 
-#' @param X a N x matrix of isoform counts, values restricted between 0 and 
-#' @param direction a numeric vector indicating the direction of differentially expression
-#' with 1 indicating higher expressed and -1 indicating lower expressed in the 'case' sample. 
+#' @param proportion_mat a matrix of proportions of each isoform for each sample in the pair.
+#' @param only_expressed a logical when set to TRUE the gene must be expressed in both samples.
 #'
-#' @return a numeric vector of signed z-scores
+#' @return a numeric between 0 and 1. It is the Hellinger distance.
 #'
-#' @examples
-#' set.seed(44)
-#' N <- 100
-#' p_values <- stats::runif(N)
-#' directions <- sample(c(-1,1), size = N, replace = TRUE)
-#' zscores <- compute_zscore(p_values, directions)
-#' \dontrun{
-#' stats::qqnorm(zscores); abline(0,1)
-#' }
+#' @seealso \code{\link{compute_hellinger}} \code{\link{get_OR}} \code{link{transform_iso_gene}} \code{link{transform_gene_pathway}} \code{\link{blca_patient_iso_kegg}}
 #' 
 #' @export
 compute_hellinger <- function(proportion_mat, only_expressed = T) {
@@ -43,29 +33,18 @@ compute_hellinger <- function(proportion_mat, only_expressed = T) {
     return(hel_dist)
 }
 
-#' Compute Hellinger distance for gene-specific isoforms given pair of measurements
+#' Computes odds ratios for each pathway to quantify enrichment of alternatively spliced genes.
 #'
-#' \code{compute_hellinger} transforms a p_value vector to signed z-score vector.
+#' \code{get_OR} computes odds ratios for each pathway to quantify enrichment of alternatively spliced genes.
 #'
-#' @details This function provides the Hellinger distance between two samples.
-#' This distance is used to quantify differential isoform usage.
-#' PROVIDE FORMULA
-#' 
-#' @param X a N x matrix of isoform counts, values restricted between 0 and 
-#' @param direction a numeric vector indicating the direction of differentially expression
-#' with 1 indicating higher expressed and -1 indicating lower expressed in the 'case' sample. 
+#' @param tmp_genes a character vector specifying the gene symbols annotated to the pathway of interest.
+#' @param dist_data a data frame indicating whether a gene is alternatively spliced or not. 
 #'
-#' @return a numeric vector of signed z-scores
+#' @param genes_range a two-component vector to filter gene sets based on minimum and maximum number of genes. Default is (15, 500).
 #'
-#' @examples
-#' set.seed(44)
-#' N <- 100
-#' p_values <- stats::runif(N)
-#' directions <- sample(c(-1,1), size = N, replace = TRUE)
-#' zscores <- compute_zscore(p_values, directions)
-#' \dontrun{
-#' stats::qqnorm(zscores); abline(0,1)
-#' }
+#' @return a list containing the odds ratio and number of measured genes in the pathway.
+#'
+#' @seealso \code{\link{compute_hellinger}} \code{\link{get_OR}} \code{link{transform_iso_gene}} \code{link{transform_gene_pathway}} \code{\link{blca_patient_iso_kegg}}
 #' 
 #' @export
 get_OR <- function(tmp_genes, dist_data, genes_range = c(15,500)) {
@@ -90,36 +69,28 @@ get_OR <- function(tmp_genes, dist_data, genes_range = c(15,500)) {
             return(list(odds_ratio = to_return, num_genes = length(measured_genes)))
 }
 
-#' N-of-1-\emph{pathways} Mahalanobis distance (MD) Calculation
+#' Transforms gene-level distances into a pathway enrichment profiles
 #'
-#' \code{compute_nof1_md} computes N-of-1-\emph{pathways} Mahalanobis distance (MD)
-#' statistic, direction, and P-value for a pathway (Schissler et al. 2015).
+#' \code{transform_iso_gene} transforms isoform counts into gene-wise Hellinger distances.
 #'
-#' @details This function enables gene set (pathway) testing for a single pathway while providing a context-meaningful effect size. In the original publication by Schissler et al. 2015, the P-value was produced via a nonparametric bootstrapping procedure. However, in later yet unpublished studies, it has been determined that a simple paired \emph{t}-test performs as well and much faster. Therefore the \emph{t}-test has been implemented. For a nonparametric approach use N-of-1-\emph{pathways} Wilcoxon for Gardeux et al. 2014.
+#' @details This function is a wrapper to compute Hellinger distances for each gene. It first filters according to expressed genes (or a user-specified threshold).
 #' 
-#' @param baseline A vector (paired with case) containing all gene expression
-#' @param case A vector (paired with baseline) containing all gene expression
-#' @param ... Other arguments for stats::t.test.
+#' @param gene_list A list with length equal to the number of genes under consideration. List elements are matrices contaning the paired isoform expression for each gene. List elements are named using HUGO gene symbols.
+#' @param expr_threshold A numeric value that specifies a low expression filter. The total gene count in each sample must be larger than this threshold. The default of 0 forces the gene to be expressed in both samples.
+#' @param ... Other arguments for n1pas functions
 #'
-#' @return A list with the pathway_score (average MD score),
-#' direction (up or down relative to the baseline),
-#' and p_value. P_value is computed via a t.test.
-#' 
+#' @return numeric. A vector of length equal to the number of genes contaning the gene-wise Hellinger distance.
+#'
 #' @references
+#' #' Efron, B. (2013). “Local False Discovery Rates,” in Large-Scale Inference doi:10.1017/cbo9780511761362.006
+#' 
+#' Schissler, A. Grant, et al. "A single-subject method to detect pathway enriched with alternatively spliced genes." Frontiers in Genetics, to appear, (2019)
+#' 
 #' Gardeux, Vincent, et al. "'N-of-1-\emph{pathways}' unveils personal deregulated mechanisms from a single pair of RNA-Seq samples: towards precision medicine." Journal of the American Medical Informatics Association 21.6 (2014): 1015-1025.
 #' 
 #' Schissler, A. Grant, et al. "Dynamic changes of RNA-sequencing expression for precision medicine: N-of-1-\emph{pathways} Mahalanobis distance within pathways of single subjects predicts breast cancer survival." Bioinformatics 31.12 (2015): i293-i302.
 #'
-#' @seealso \code{link{compute_nof1_wilcoxon}}, \code{link{compute_nof1_pathways}}, \code{link{compute_multi_nof1_pathways}}
-#'
-#' @examples
-#' ## compute N-of-1-pathways MD for a single pathway
-#' set.seed(44)
-#' N <- 10
-#' gene1 <- stats::rchisq(N, 5)
-#' gene2 <- stats::rchisq(N, 5)
-#' md_res <- compute_nof1_md(gene1, gene2)
-#' print(md_res)
+#' @seealso \code{\link{compute_hellinger}} \code{\link{get_OR}} \code{link{transform_iso_gene}} \code{link{transform_gene_pathway}} \code{\link{blca_patient_iso_kegg}}
 #' 
 #' @export
 transform_iso_gene <- function(gene_list, expr_threshold = 0, ...) {
@@ -186,15 +157,16 @@ transform_iso_gene <- function(gene_list, expr_threshold = 0, ...) {
 #'  \item{pathway_desc}{character. Description of the pathway provided by the user.}
 #' }
 #'
+#' @seealso \code{\link{compute_hellinger}} \code{\link{get_OR}} \code{link{transform_iso_gene}} \code{link{transform_gene_pathway}} \code{\link{blca_patient_iso_kegg}}
+#' 
 #' @references
 #' #' Efron, B. (2013). “Local False Discovery Rates,” in Large-Scale Inference doi:10.1017/cbo9780511761362.006
 #' 
 #' Schissler, A. Grant, et al. "A single-subject method to detect pathway enriched with alternatively spliced genes." Frontiers in Genetics, to appear, (2019)
+#' 
 #' Gardeux, Vincent, et al. "'N-of-1-\emph{pathways}' unveils personal deregulated mechanisms from a single pair of RNA-Seq samples: towards precision medicine." Journal of the American Medical Informatics Association 21.6 (2014): 1015-1025.
 #' 
 #' Schissler, A. Grant, et al. "Dynamic changes of RNA-sequencing expression for precision medicine: N-of-1-\emph{pathways} Mahalanobis distance within pathways of single subjects predicts breast cancer survival." Bioinformatics 31.12 (2015): i293-i302.
-#'
-#' @seealso \code{link{compute_nof1_wilcoxon}}, \code{link{compute_nof1_pathways}}, \code{link{compute_multi_nof1_pathways}}
 #'
 #' @export
 transform_gene_pathway <- function(gene_dist, annot_file, desc_file = NULL, genes_range = c(15, 500), fdr_threshold = 0.2, plot_locfdr = 0, small_ontology = TRUE, custom_locfdr = FALSE, ...) {
