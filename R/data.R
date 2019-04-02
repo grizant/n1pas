@@ -1,23 +1,19 @@
-#' 8 paired RNA-seq samples from 4 BRCA_TCGA patients.
+#' Normal-tumor paired isoform-level RNA-seq for a BLCA TCGA patient.
 #'
-#' A RNA-seq data set containing read counts for 12 pairs of transcriptomes
-#' from 12 breast cancer (BRCA) patients.
+#' An isoform-level RNA-seq data set containing read counts for a pair of transcriptomes
+#' from a bladder cancer (BLCA) patients.
 #' All gene expression counts have been adjusted for multi-read assignment by
 #' RSEM (RNA-Seq by Expectation-Maximization). Otherwise, data are unnormalized.
 #' Platform used was Illumina RNA-seq V2. Downloaded Dec 2014.
-#' Rows are labeled by HGNC gene symbol.
+#' Rows are labeled by isoform ID and further annotated to HGNC gene symbols.
+#' Genes were filtered to include only those in the KEGG pathway ontology.
 #'
-#' @format A data frame with 20501 rows and 24 variables:
+#' @format A data frame with 18823 rows and 3 variables:
 #' \describe{
-#' \item{TCGA.A7.A0DB.N}{The counts from A7.A0DB non-tumor breast tissue, N=normal}
-#'   \item{TCGA.A7.A0DB.T}{The counts from A7.A0DB tumor breast tissue, T=tumor}
-#' \item{TCGA.AC.A2FM.N}{The counts from AC.A2FM non-tumor breast tissue, N=normal}
-#'   \item{TCGA.AC.A2FM.T}{The counts from AC.A2FM tumor breast tissue, T=tumor}
-#' \item{TCGA.BH.A1EU.N}{The counts from BH.A1EU non-tumor breast tissue, N=normal}
-#'   \item{TCGA.BH.A1EU.T}{The counts from BH.A1EU tumor breast tissue, T=tumor}
-#'  \item{TCGA.E2.A153.N}{The counts from E2.A153 non-tumor breast tissue, N=normal}
-#'   \item{TCGA.E2.A153.T}{The counts from E2.A153 tumor breast tissue, T=tumor}
-#'   
+#' \item{row.names}{isoform ID}
+#'   \item{geneSymbol}{HUGO gene symbol corresponding to the isoform ID}
+#' \item{TCGA-BL-A13J-N}{The counts from a AC.A2FM non-tumor bladder tissue, N=normal}
+#'   \item{TCGA-BL-A13J-T}{The counts from AC.A2FM tumor bladder tissue, T=tumor}
 #' }
 #' @source \url{https://tcga-data.nci.nih.gov}
 "blca_patient_iso_kegg"
