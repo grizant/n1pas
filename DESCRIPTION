@@ -7,6 +7,8 @@ Authors@R:
            role = c("aut", "cre"),
            email = "aschissler@unr.edu")
 Description: This R package provides functions, data, and tutorials to detect genetic pathways enriched with alternatively spliced genes. This analysis takes two paired RNA-seq samples and pathway annotations as inputs. And provides a ranked list of pathways enriched with alternatively spliced genes, along with effect sizes and uncertainty quantification.
+Depends:
+    R (>= 2.10)
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true

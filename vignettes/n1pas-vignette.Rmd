@@ -81,7 +81,10 @@ Often, a clinician or researcher *a priori* selects pathways of interest to stud
 ```{r pathway_scores}
 ## Run and store Nof1-pathways Mahalanobis distance for the 4 pairs of data.
 annot_file <- file.path(my_path, "extdata/kegg_tb.txt")
+## annot_file <- file.path(my_path, "inst/extdata/kegg_tb.txt")
 desc_file <- file.path(my_path, "extdata/kegg.description_tb.txt")
+## desc_file <- file.path(my_path, "inst/extdata/kegg.description_tb.txt")
+
 iso_data <- blca_patient_iso_kegg
 
 enrichment_profile <- compute_n1pas(iso_data = iso_data, annot_file = annot_file, desc_file = desc_file, iso_range = c(2,30), genes_range = c(15,500), small_ontology = TRUE, plot_locfdr = 1)

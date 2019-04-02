@@ -8,9 +8,8 @@
 #' Rows are labeled by isoform ID and further annotated to HGNC gene symbols.
 #' Genes were filtered to include only those in the KEGG pathway ontology.
 #'
-#' @format A data frame with 18823 rows and 3 variables:
+#' @format A data frame with 18823 rows (labeled by isoform ID) and 3 variables:
 #' \describe{
-#' \item{row.names}{isoform ID}
 #'   \item{geneSymbol}{HUGO gene symbol corresponding to the isoform ID}
 #' \item{TCGA-BL-A13J-N}{The counts from a AC.A2FM non-tumor bladder tissue, N=normal}
 #'   \item{TCGA-BL-A13J-T}{The counts from AC.A2FM tumor bladder tissue, T=tumor}

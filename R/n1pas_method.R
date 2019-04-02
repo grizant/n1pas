@@ -183,7 +183,7 @@ transform_gene_pathway <- function(gene_dist, annot_file, desc_file = NULL, gene
     
     ## 1. Structure gene set definitions
     ## read in gene set (pathway) annotation
-    annot_data <- read.delim2(file = annot_file, stringsAsFactors = F)
+    annot_data <- utils::read.delim2(file = annot_file, stringsAsFactors = F)
 
     ## restructure into a list of pathways
     ## make path_id_name a variable, path_id_name <- "path_id"
@@ -346,8 +346,7 @@ compute_n1pas <- function(iso_data, annot_file, desc_file = NULL, iso_range = c(
  
     ## 2. Compute pathway-level metrics
     to_return <- transform_gene_pathway(gene_dist = gene_dist, annot_file = annot_file,
-                                        desc_file = desc_file, method = pathway_method,
-                                        genes_range = genes_range, ...)
+                                        desc_file = desc_file, genes_range = genes_range, ...)
 
     ## 3. Return scored and sorted pathways
     return(to_return)
