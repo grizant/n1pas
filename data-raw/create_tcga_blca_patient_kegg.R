@@ -4,6 +4,8 @@
 ## Isoform RNA-seq data for one TCGA BLCA patient
 ## Data already filtered to genes annotated in KEGG to reduce size
 blca_patient_iso_kegg <- readRDS("inst/extdata/blca_patient_iso_kegg.rds")
+## remove the isoformID column as the rows are labeled with this information
+blca_patient_iso_kegg <- blca_patient_iso_kegg[,-1]
 usethis::use_data(blca_patient_iso_kegg, overwrite = TRUE)
 
 ## Derived from manuscript files:
