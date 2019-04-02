@@ -160,18 +160,32 @@ transform_iso_gene <- function(gene_list, expr_threshold = 0, ...) {
 
 #' Transforms gene-level distances into a pathway enrichment profiles
 #'
-#' \code{transform_gene_pathway} computes odds ratios afits a mixture model to 
+#' \code{transform_gene_pathway} computes odds ratios of enrichment with alternatively spliced genes. Then fits a mixture model to identify enriched pathways.
 #'
-#' @details This function enables gene set (pathway) testing for a single pathway while providing a context-meaningful effect size. In the original publication by Schissler et al. 2015, the P-value was produced via a nonparametric bootstrapping procedure. However, in later yet unpublished studies, it has been determined that a simple paired \emph{t}-test performs as well and much faster. Therefore the \emph{t}-test has been implemented. For a nonparametric approach use N-of-1-\emph{pathways} Wilcoxon for Gardeux et al. 2014.
+#' @details This function is the main workhorse of the package. It first computes odds ratios of enrichment then fits a mixture model via the \code{locfdr} package. For large ontologies (greater than 1000 gene sets), the defaults of locfdr are likely to be adequate. For small ontologies we have developed custom parameters (set small_ontology to TRUE). The fit can be customized by setting \code{custom_locfdr} to TRUE and \code{small_ontology} to FALSE. Please see locfdr for more details.
 #' 
-#' @param baseline A vector (paired with case) containing all gene expression
-#' @param case A vector (paired with baseline) containing all gene expression
-#' @param ... Other arguments for stats::t.test.
+#' @param gene_dist A named vector of Hellinger distances. Names are HUGO gene symbols
+#' @param annot_file The path and file name for the gene set annotations
+#' @param desc_file The path and file name for gene set descriptions
+#' @param genes_range a two-component vector to filter gene sets based on minimum and maximum number of genes. Default is (15, 500).
+#' @param fdr_threshold A numeric atomic threshold for local fdr
+#' @param plot_locfdr A numeric indicating whether the mixture model should be plotted. 0 = no, 1 = yes. See locfdr for more options and details.
+#' @param small_ontology Logical. Set to TRUE to use small ontology customizations and FALSE to not.
+#' @param custom_locfdr Logical. Set to TRUE to pass your own locfdr parameters and FALSE to use the defaults or \code{small_ontology} customizations.
+#' @param ... Other arguments for n1pas, locfdr, and other package's functions
 #'
-#' @return A list with the pathway_score (average MD score),
-#' direction (up or down relative to the baseline),
-#' and p_value. P_value is computed via a t.test.
-#' 
+#' @return pathway (gene set) enrichment profile organized in a data frame with 7 variables sorted by local fdr value.
+#' \describe{
+#'   \item{row.names}{rows are labeled by user-specified gene set ID, the "path_id"}
+#'   \item{pathway_score}{numeric. N1PAS's effect size: an odds ratio quantifying pathawy enrichment of alternatively spliced genes}
+#'   \item{fdr_value}{numeric. local false discovery rate. See Efron 2013}
+#'   \item{num_genes_annot}{numeric. Number of genes annotated to the pathway from gene set input}
+#'   \item{num_genes_measured}{numeric. Number of genes measured and expressed (in at least one sample) within the pathway.}
+#'   \item{upper_fdr_threshold}{numeric. Odds ratios larger than this threshold are identified as enriched with alternatively spliced genes.}
+#'   \item{diff_splice_call}{numeric. Binary values with 1 being pathway is enriched and 0 otherwise.}
+#'  \item{pathway_desc}{character. Description of the pathway provided by the user.}
+#' }
+#'
 #' @references
 #' #' Efron, B. (2013). “Local False Discovery Rates,” in Large-Scale Inference doi:10.1017/cbo9780511761362.006
 #' 
