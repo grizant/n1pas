@@ -1,10 +1,10 @@
 ---
-title: "N-of-1-*pathways* via the `nof1` R package"
+title: "N-of-1-*pathways* Alternatively Spliced via the `n1pas` R package"
 author: "A. Grant Schissler"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteIndexEntry{Using N1PAS}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -18,7 +18,7 @@ Welcome to the <span style="color:purple">N-of-1-*pathways*</span> analysis tuto
 The software transforms a pair of transcriptomes from a single subject to a personal profile of pathway dysregulation^[Gardeux, V. et al. N-of-1-pathways unveils personal deregulated mechanisms from a single pair of RNA-Seq samples: towards precision medicine. J. Am. Med. Inform. Assoc. 21, 1015–25 (2014).]. The algorithm quantifies dysregulation^[Schissler, A. G. et al. Dynamic changes of RNA-sequencing expression for precision medicine: N-of-1-pathways Mahalanobis distance within pathways of single subjects predicts breast cancer survival. Bioinformatics 31, i293–i302 (2015).] (**effect size**) within a gene set along with statistical significance (**p-value**) in high throughput. Lastly, personal dysregulation profiles are visualized for pattern recognition through novel 'omic **rose plots**^[Schissler, A. Grant, et al. "Analysis of aggregated cell–cell statistical distances within pathways unveils therapeutic-resistance mechanisms in circulating tumor cells." Bioinformatics 32.12 (2016): i80-i89.]. Moreover, these paired calculations can be applied in related problems, such as single-cell RNA-seq^3. Please refer to the references provided in the footnotes for details on these methods. The schematic below illustrates the <span style="color:purple">N-of-1-*pathways*</span> workflow:
 
 ```{r workflow_png, echo = F, out.width = 700, fig.retina = NULL}
-knitr::include_graphics("workflow_diagram.png")
+knitr::include_graphics("workflow_diagram.jpg")
 ```
 
 ## Scope of the tutorial
@@ -33,15 +33,15 @@ In this demonstration, we will apply <span style="color:purple">N-of-1-*pathways
 
 As the `nof1` package is not available on a public repository, the package must first be downloaded to a local destination. Then install using the following command (after updating with the system-specific path and version):
 
-`install.packages("/path/to/source/nof1_X.X.X.tar.gz", repos = NULL, type="source")`
+`devtools::install_github("grizant/n1pas")`
 
 Be sure to employ the usual `library()` call in any data analysis scripts after installation.
 
 ```{r lib}
 ## Load and attach the nof1 package after installation.
-library(nof1)
+library(n1pas)
 ## Retrieve the library location to access files needed for this tutorial
-my_path <- find.package("nof1")
+my_path <- find.package("n1pas")
 ```
 
 ## Step 1: Read gene expression data and define sample pairings
@@ -58,38 +58,10 @@ Notably, gene expression data can also be read into R using utilities provided b
 ## Example syntax for a text file:
 ## my_data <- read_gene_data("/path/to/file/gene_expr.txt")
 ## Load compressed gene expression data for the tutorial 
-data(BRCA_TCGA_4_patients)
+data(blca_patient_iso_kegg)
 ## Display a few genes for the first two pairs of transcriptomes.
-BRCA_TCGA_4_patients[1:5, 1:4]
-```
-
-### (Recommended) Normalize the gene expression data
-
-It is crucial for the downstream analysis that the pair of transcriptomes have been normalized to make valid differential expression calculations. There are not many options for single-sample normalization: so we use the simple *transcripts per million* approach for RNA-seq data.
-
-```{r normalize}
-## Read four matched pairs of RNA-seq data sets.
-gene_data <- normalize_multi_gene_data(BRCA_TCGA_4_patients, method = "tpm")
-## Check the result.
-apply(gene_data, 2, sum)
-```
-
-### 1.2: Define sample pairings
-
-<span style="color:purple">N-of-1-*pathways*</span> is a paired analysis framework. Two transcriptomes (usually from the same patient) are analyzed for differential expression at the level gene sets (pathways). As such, one must provide the software guidance as to which samples are to be compared and, in particular, which sample is considered the "baseline" and "case" samples.
-
-It is important to note that in `gene_data` above that the sample names are in a highly specific order. `compute_multi_nof1_pathways` assumes that the column (sample) order provided is of the form BaselinePair1, CasePair1, BaselinePair2, CasePair2, etc. However, one can specify the pairings via use of the `read_sample_data` and `write_sample_data` functions for complete control of the pairing specifications.
-
-Also, it is important to note that patient/sample IDs (columns) cannot include the '-' character as
-pairs are automatically named using this to show the direction of subtraction.
-
-```{r read_sample_pairing}
-## Define pairings using a text file (included in the package as an example).
-sample_data <- read_sample_data(file.path( my_path, "inst/extdata/example_sample_data_tcga_brca_4_patients.txt"))
-## Display the how these pairs are defined using this format.
-sample_data
-## Provide the total num of pairs.
-max(as.numeric(sample_data$PairNum))
+head(blca_patient_iso_kegg)
+## Note that the rows are labeled by isoform ID
 ```
 
 ## Step 2: Define pathways via a knowledgebase
@@ -100,16 +72,16 @@ From a practical standpoint, the format required is a 'long' structure. A tab-de
 
 ```{r read_gene_set}
 ## An example of how to read in a pathway definitions.
-pid_filtered <- read_gene_set(file.path(my_path,"inst/extdata/PID_filtered15-X.txt"))
-head(pid_filtered)
+## kegg_annot <- read_gene_set(file.path(my_path,"inst/extdata/PID_filtered15-X.txt"))
+head(kegg_annot)
 ```
 
 It is often useful to include pathway descriptions in the output of the <span style="color:purple">N-of-1-*pathways*</span> framework. The format is very similar to above, but with the second variable indicated the pathway description - not pathway membership.
 
 ```{r read_gene_desc}
 ## note that read_gene_set reads both gene set definitions and descriptions
-pid_desc <- read_gene_set(file.path( my_path, "inst/extdata/PID_description.txt"))
-head(pid_desc)
+## pid_desc <- read_gene_set(file.path( my_path, "inst/extdata/PID_description.txt"))
+head(kegg_desc)
 ```
 
 ## Step 3: Compute pathway dysregulation profiles
@@ -122,26 +94,20 @@ Often, a clinician or researcher *a priori* selects pathways of interest to stud
 
 ```{r pathway_scores}
 ## Run and store Nof1-pathways Mahalanobis distance for the 4 pairs of data.
-pathway_scores <- compute_multi_nof1_pathways(gene_data, sample_data = sample_data,
-                                              gene_set = pid_filtered,
-                                              model = "md", gene_set_desc = pid_desc)
+annot_file <- file.path(my_path,"inst/extdata/kegg_tb.txt")
+desc_file <- file.path(my_path,"inst/extdata/kegg.description_tb.txt")
+iso_data <- blca_patient_iso_kegg
+
+enrichment_profile <- compute_n1pas(iso_data = iso_data, annot_file = annot_file, desc_file = desc_file, iso_range = c(2,30), genes_range = c(15,500), small_ontology = TRUE)
+
 ## Explore the top five dysregulated pathways for the first patient.
-pathway_scores[[1]][1:5,]
+head(enrichment_profile, 15)
 ## Store the top five pathways ID ("path_id") to compare to other patients.
-top_ids <- row.names(pathway_scores[[1]])[1:5]
 ```
-Note for larger data sets and ontologies, memory issues/speed could preclude the computation. In that case, it is advised to break up the analysis into smaller pieces and/or use the parallelization parameter in the function call. Also, the use of high-performance computing clusters is applicable.
 
 ## Step 4: Visualize top pathway scores across patients
 
 Finally, the `nof1` package includes novel visualization tools to study and compare pathway dysregulation profiles. One such plot a rose plot. 
-
-```{r rose_plot, fig.width = 15, out.width = 700, fig.height = 10}
-## Shorten the pair names for display.
-names(pathway_scores) <- gsub("TCGA\\.", "", names(pathway_scores))
-## Create multiple rose plots, paneled by patient.
-create_multi_rose_plot(pathway_scores, which_pathways = top_ids)
-```
 
 Here the negative natural logarithm of the p-values corresponding the each of the top five dysregulated pathways for patient A7.A0DB determine the radii for the 'petals'. The petal areas are properly scaled so that the areas are proportional to the statistical significance of dysregulation. Note that there are a total of five petals for each rose plot. Petals above the horizontal axis (in blue) represent pathways that are higher expressed in the tumor tissue and conversely for the pathways that are down-regulated (in brown).
 
@@ -153,8 +119,8 @@ That concludes this tutorial to the `nof1` package to implement the <span style=
 
 Also, we greatly appreciate your support by citing the <span style="color:purple">N-of-1-*pathways*</span> framework:
 
-```{citation}
-citation("nof1")
+```{r, citation}
+citation("n1pas")
 ```
 
 Please also cite any particular method within the framework such as the Mahlanobis distance.

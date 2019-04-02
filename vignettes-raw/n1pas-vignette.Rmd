@@ -58,38 +58,10 @@ Notably, gene expression data can also be read into R using utilities provided b
 ## Example syntax for a text file:
 ## my_data <- read_gene_data("/path/to/file/gene_expr.txt")
 ## Load compressed gene expression data for the tutorial 
-data(BRCA_TCGA_4_patients)
+data(blca_patient_iso_kegg)
 ## Display a few genes for the first two pairs of transcriptomes.
-BRCA_TCGA_4_patients[1:5, 1:4]
-```
-
-### (Recommended) Normalize the gene expression data
-
-It is crucial for the downstream analysis that the pair of transcriptomes have been normalized to make valid differential expression calculations. There are not many options for single-sample normalization: so we use the simple *transcripts per million* approach for RNA-seq data.
-
-```{r normalize}
-## Read four matched pairs of RNA-seq data sets.
-gene_data <- normalize_multi_gene_data(BRCA_TCGA_4_patients, method = "tpm")
-## Check the result.
-apply(gene_data, 2, sum)
-```
-
-### 1.2: Define sample pairings
-
-<span style="color:purple">N-of-1-*pathways*</span> is a paired analysis framework. Two transcriptomes (usually from the same patient) are analyzed for differential expression at the level gene sets (pathways). As such, one must provide the software guidance as to which samples are to be compared and, in particular, which sample is considered the "baseline" and "case" samples.
-
-It is important to note that in `gene_data` above that the sample names are in a highly specific order. `compute_multi_nof1_pathways` assumes that the column (sample) order provided is of the form BaselinePair1, CasePair1, BaselinePair2, CasePair2, etc. However, one can specify the pairings via use of the `read_sample_data` and `write_sample_data` functions for complete control of the pairing specifications.
-
-Also, it is important to note that patient/sample IDs (columns) cannot include the '-' character as
-pairs are automatically named using this to show the direction of subtraction.
-
-```{r read_sample_pairing}
-## Define pairings using a text file (included in the package as an example).
-sample_data <- read_sample_data(file.path( my_path, "inst/extdata/example_sample_data_tcga_brca_4_patients.txt"))
-## Display the how these pairs are defined using this format.
-sample_data
-## Provide the total num of pairs.
-max(as.numeric(sample_data$PairNum))
+head(blca_patient_iso_kegg)
+## notice that the rows are labeled by isoform ID
 ```
 
 ## Step 2: Define pathways via a knowledgebase
@@ -100,16 +72,16 @@ From a practical standpoint, the format required is a 'long' structure. A tab-de
 
 ```{r read_gene_set}
 ## An example of how to read in a pathway definitions.
-pid_filtered <- read_gene_set(file.path(my_path,"inst/extdata/PID_filtered15-X.txt"))
-head(pid_filtered)
+## kegg_annot <- read_gene_set(file.path(my_path,"inst/extdata/PID_filtered15-X.txt"))
+head(kegg_annot)
 ```
 
 It is often useful to include pathway descriptions in the output of the <span style="color:purple">N-of-1-*pathways*</span> framework. The format is very similar to above, but with the second variable indicated the pathway description - not pathway membership.
 
 ```{r read_gene_desc}
 ## note that read_gene_set reads both gene set definitions and descriptions
-pid_desc <- read_gene_set(file.path( my_path, "inst/extdata/PID_description.txt"))
-head(pid_desc)
+## pid_desc <- read_gene_set(file.path( my_path, "inst/extdata/PID_description.txt"))
+head(kegg_desc)
 ```
 
 ## Step 3: Compute pathway dysregulation profiles
