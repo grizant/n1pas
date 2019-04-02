@@ -2,46 +2,59 @@
 % Please edit documentation in R/n1pas_method.R
 \name{transform_gene_pathway}
 \alias{transform_gene_pathway}
-\title{N-of-1-\emph{pathways} Mahalanobis distance (MD) Calculation}
+\title{Transforms gene-level distances into a pathway enrichment profiles}
 \usage{
 transform_gene_pathway(gene_dist, annot_file, desc_file = NULL,
   genes_range = c(15, 500), fdr_threshold = 0.2, plot_locfdr = 0,
   small_ontology = TRUE, custom_locfdr = FALSE, ...)
 }
 \arguments{
-\item{...}{Other arguments for stats::t.test.}
+\item{gene_dist}{A named vector of Hellinger distances. Names are HUGO gene symbols}
 
-\item{baseline}{A vector (paired with case) containing all gene expression}
+\item{annot_file}{The path and file name for the gene set annotations}
 
-\item{case}{A vector (paired with baseline) containing all gene expression}
+\item{desc_file}{The path and file name for gene set descriptions}
+
+\item{genes_range}{a two-component vector to filter gene sets based on minimum and maximum number of genes. Default is (15, 500).}
+
+\item{fdr_threshold}{A numeric atomic threshold for local fdr}
+
+\item{plot_locfdr}{A numeric indicating whether the mixture model should be plotted. 0 = no, 1 = yes. See locfdr for more options and details.}
+
+\item{small_ontology}{Logical. Set to TRUE to use small ontology customizations and FALSE to not.}
+
+\item{custom_locfdr}{Logical. Set to TRUE to pass your own locfdr parameters and FALSE to use the defaults or \code{small_ontology} customizations.}
+
+\item{...}{Other arguments for n1pas, locfdr, and other package's functions}
 }
 \value{
-A list with the pathway_score (average MD score),
-direction (up or down relative to the baseline),
-and p_value. P_value is computed via a t.test.
+pathway (gene set) enrichment profile organized in a data frame with 7 variables sorted by local fdr value.
+\describe{
+\item{row.names}{rows are labeled by user-specified gene set ID, the "path_id"}
+\item{pathway_score}{numeric. N1PAS's effect size: an odds ratio quantifying pathawy enrichment of alternatively spliced genes}
+\item{fdr_value}{numeric. local false discovery rate. See Efron 2013}
+\item{num_genes_annot}{numeric. Number of genes annotated to the pathway from gene set input}
+\item{num_genes_measured}{numeric. Number of genes measured and expressed (in at least one sample) within the pathway.}
+\item{upper_fdr_threshold}{numeric. Odds ratios larger than this threshold are identified as enriched with alternatively spliced genes.}
+\item{diff_splice_call}{numeric. Binary values with 1 being pathway is enriched and 0 otherwise.}
+\item{pathway_desc}{character. Description of the pathway provided by the user.}
+}
 }
 \description{
-\code{compute_nof1_md} computes N-of-1-\emph{pathways} Mahalanobis distance (MD)
-statistic, direction, and P-value for a pathway (Schissler et al. 2015).
+\code{transform_gene_pathway} computes odds ratios of enrichment with alternatively spliced genes. Then fits a mixture model to identify enriched pathways.
 }
 \details{
-This function enables gene set (pathway) testing for a single pathway while providing a context-meaningful effect size. In the original publication by Schissler et al. 2015, the P-value was produced via a nonparametric bootstrapping procedure. However, in later yet unpublished studies, it has been determined that a simple paired \emph{t}-test performs as well and much faster. Therefore the \emph{t}-test has been implemented. For a nonparametric approach use N-of-1-\emph{pathways} Wilcoxon for Gardeux et al. 2014.
-}
-\examples{
-## compute N-of-1-pathways MD for a single pathway
-set.seed(44)
-N <- 10
-gene1 <- stats::rchisq(N, 5)
-gene2 <- stats::rchisq(N, 5)
-md_res <- compute_nof1_md(gene1, gene2)
-print(md_res)
-
+This function is the main workhorse of the package. It first computes odds ratios of enrichment then fits a mixture model via the \code{locfdr} package. For large ontologies (greater than 1000 gene sets), the defaults of locfdr are likely to be adequate. For small ontologies we have developed custom parameters (set small_ontology to TRUE). The fit can be customized by setting \code{custom_locfdr} to TRUE and \code{small_ontology} to FALSE. Please see locfdr for more details.
 }
 \references{
+#' Efron, B. (2013). “Local False Discovery Rates,” in Large-Scale Inference doi:10.1017/cbo9780511761362.006
+
+Schissler, A. Grant, et al. "A single-subject method to detect pathway enriched with alternatively spliced genes." Frontiers in Genetics, to appear, (2019)
+
 Gardeux, Vincent, et al. "'N-of-1-\emph{pathways}' unveils personal deregulated mechanisms from a single pair of RNA-Seq samples: towards precision medicine." Journal of the American Medical Informatics Association 21.6 (2014): 1015-1025.
 
 Schissler, A. Grant, et al. "Dynamic changes of RNA-sequencing expression for precision medicine: N-of-1-\emph{pathways} Mahalanobis distance within pathways of single subjects predicts breast cancer survival." Bioinformatics 31.12 (2015): i293-i302.
 }
 \seealso{
-\code{link{compute_nof1_wilcoxon}}, \code{link{compute_nof1_pathways}}, \code{link{compute_multi_nof1_pathways}}
+\code{\link{compute_hellinger}} \code{\link{get_OR}} \code{link{transform_iso_gene}} \code{link{transform_gene_pathway}} \code{\link{blca_patient_iso_kegg}}
 }

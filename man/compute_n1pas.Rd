@@ -21,18 +21,16 @@ compute_n1pas(iso_data, annot_file, desc_file = NULL, iso_range = c(2,
 \item{...}{Other arguments for other n1pas functions}
 }
 \value{
-pathway (gene set) scores organized in a data frame with 9 variables sorted by p-values.
+pathway (gene set) enrichment profile organized in a data frame with 7 variables sorted by local fdr value.
 \describe{
 \item{row.names}{rows are labeled by user-specified gene set ID, the "path_id"}
-\item{pathway_score}{numeric. N-of-1-pathway score quantifying differential pathway expression, depending on the model}
-\item{direction}{numeric. Direction of differential expression. 1 = 'up' in case, -1 = 'down' in case}
-\item{p_value}{numeric. p_value resulting for the pathway as determinded by the model of choice}
-\item{num_genes_annot}{numeric. Number of genes annotated to the pathway from gene_set input}
-\item{num_genes_measured}{numeric. Number of genes measured within the pathway for baseline and case samples}
-\item{model}{character. The Nof1-pathways model applied to score the pathway}
-\item{zscore}{numeric. A transformation of the p_value. see nof1::compute_zscore}
-\item{pathway_desc}{character. Annotations for the scored pathways}
-\item{adj_p_value}{numeric. adj_p_value resulting for the pathway as determinded by the model of choice}
+\item{pathway_score}{numeric. N1PAS's effect size: an odds ratio quantifying pathawy enrichment of alternatively spliced genes}
+\item{fdr_value}{numeric. local false discovery rate. See Efron 2013}
+\item{num_genes_annot}{numeric. Number of genes annotated to the pathway from gene set input}
+\item{num_genes_measured}{numeric. Number of genes measured and expressed (in at least one sample) within the pathway.}
+\item{upper_fdr_threshold}{numeric. Odds ratios larger than this threshold are identified as enriched with alternatively spliced genes.}
+\item{diff_splice_call}{numeric. Binary values with 1 being pathway is enriched and 0 otherwise.}
+\item{pathway_desc}{character. Description of the pathway provided by the user.}
 }
 }
 \description{
@@ -45,59 +43,15 @@ This function performs the entire N1PAS workflow for a pair of samples.
 \note{
 This function requires does not require library-size normalized data as the Hellinger distance is invariant under scaling.
 }
-\examples{
-## Perform N-of-1-pathways for a few gene sets
-## defined by the pre-filtered Pathway Interaction Database (PID).
-## for a single the cancer genome atlas (TCGA) breast cancer patient.
-num_pathways <- 5
-set.seed(4444)
-## Load gene set annotations from PID and included in the \\code{nof1} package.
-data(pid_filtered)
-## Select a few pathways.
-tmp_id <- sample(pid_filtered$path_id, num_pathways)
-gene_set <- pid_filtered[pid_filtered$path_id \%in\% tmp_id,]
-## Load breast cancer paired gene expression data for 4 patients
-data(BRCA_TCGA_4_patients)
-## Select one
-my_patient <- "TCGA.A7.A0DB"
-one_data <- BRCA_TCGA_4_patients[, grep(my_patient, names(BRCA_TCGA_4_patients))]
-## Normalize gene expression to account for unequal library sizes.
-baseline <- normalize_gene_data(one_data[ , grep("N$", names(one_data))], method = "tpm")
-case <- normalize_gene_data(one_data[ , grep("T$", names(one_data))], method = "tpm")
-## Label rows by gene symbol to reference gene set annotation.
-names(baseline) <- names(case) <- rownames(one_data)
-## Execute N-of-1-pathways Mahalanobis distance (MD) without descriptions.
-model <- "md"
-res <- compute_nof1_pathways(gene_set = gene_set, model = model,
-baseline = baseline, case = case)
-print(res)
-## Add mechanistic descriptions of pathways.
-data(pid_desc)
-res <- compute_nof1_pathways(gene_set = gene_set,
-gene_set_desc = pid_desc, model = model, baseline = baseline, case = case)
-print(res)
-## 4. Execute N-of-1-pathways Wilcoxon
-model <- "wilcoxon"
-res <- compute_nof1_pathways(gene_set = gene_set,
-gene_set_desc = pid_desc, model = model, baseline = baseline, case = case)
-print(res)
-
-}
 \references{
+Efron, B. (2013). “Local False Discovery Rates,” in Large-Scale Inference doi:10.1017/cbo9780511761362.006
+
+Schissler, A. Grant, et al. "A single-subject method to detect pathway enriched with alternatively spliced genes." Frontiers in Genetics, to appear, (2019)
+
 Gardeux, Vincent, et al. "'N-of-1-\emph{pathways}' unveils personal deregulated mechanisms from a single pair of RNA-Seq samples: towards precision medicine." Journal of the American Medical Informatics Association 21.6 (2014): 1015-1025.
 
 Schissler, A. Grant, et al. "Dynamic changes of RNA-sequencing expression for precision medicine: N-of-1-\emph{pathways} Mahalanobis distance within pathways of single subjects predicts breast cancer survival." Bioinformatics 31.12 (2015): i293-i302.
-
-Li, Qike, et al. "kMEn: Analyzing noisy and bidirectional transcriptional pathway responses in single subjects." Journal of biomedical informatics 66 (2017): 32-41.
-
-Li, Qike, et al. "N-of-1-\emph{pathways} MixEnrich: advancing precision medicine via single-subject analysis in discovering dynamic changes of transcriptomes." BMC medical genomics 10.1 (2017): 27.
-
-Schaefer, Carl F., et al. "PID: the pathway interaction database." Nucleic acids research 37.suppl 1 (2009): D674-D679.
-
-Weinstein, John N., et al. "The cancer genome atlas pan-cancer analysis project." Nature genetics 45.10 (2013): 1113-1120.
-
-Schissler, A. Grant, et al. "Analysis of aggregated cell-cell statistical distances within pathways unveils therapeutic-resistance mechanisms in circulating tumor cells." Bioinformatics 32.12 (2016): i80-i89.
 }
 \seealso{
-\code{\link{normalize_gene_data}} \code{\link{compute_multi_nof1_pathways}} \code{link{pid_filtered}} \code{link{BRCA_TCGA_BH_A1EV}} \code{link{pid_desc}}
+\code{\link{compute_hellinger}} \code{\link{get_OR}} \code{link{transform_iso_gene}} \code{link{transform_gene_pathway}} \code{\link{blca_patient_iso_kegg}}
 }

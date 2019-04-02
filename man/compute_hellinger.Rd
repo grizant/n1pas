@@ -7,13 +7,12 @@
 compute_hellinger(proportion_mat, only_expressed = T)
 }
 \arguments{
-\item{X}{a N x matrix of isoform counts, values restricted between 0 and}
+\item{proportion_mat}{a matrix of proportions of each isoform for each sample in the pair.}
 
-\item{direction}{a numeric vector indicating the direction of differentially expression
-with 1 indicating higher expressed and -1 indicating lower expressed in the 'case' sample.}
+\item{only_expressed}{a logical when set to TRUE the gene must be expressed in both samples.}
 }
 \value{
-a numeric vector of signed z-scores
+a numeric between 0 and 1. It is the Hellinger distance.
 }
 \description{
 \code{compute_hellinger} transforms a p_value vector to signed z-score vector.
@@ -21,16 +20,7 @@ a numeric vector of signed z-scores
 \details{
 This function provides the Hellinger distance between two samples.
 This distance is used to quantify differential isoform usage.
-PROVIDE FORMULA
 }
-\examples{
-set.seed(44)
-N <- 100
-p_values <- stats::runif(N)
-directions <- sample(c(-1,1), size = N, replace = TRUE)
-zscores <- compute_zscore(p_values, directions)
-\dontrun{
-stats::qqnorm(zscores); abline(0,1)
-}
-
+\seealso{
+\code{\link{compute_hellinger}} \code{\link{get_OR}} \code{link{transform_iso_gene}} \code{link{transform_gene_pathway}} \code{\link{blca_patient_iso_kegg}}
 }

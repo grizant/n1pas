@@ -8,15 +8,11 @@
 \description{
 The n1pas package provides functions to run N1PAS:
 }
-\section{N-of-1-\emph{pathways} functions}{
-
-\itemize{
-\code{\link{compute_multi_nof1_pathways}}
-\code{\link{compute_nof1_md}}
-\code{\link{compute_nof1_pathways}}
-\code{\link{compute_nof1_wilcoxon}}
-\code{\link{compute_vert_md}}
-\code{\link{compute_zscore}}
+\details{
+N1PAS functions:
+\code{\link{compute_hellinger}}
+\code{\link{get_OR}}
+\code{\link{transform_iso_gene}}
+\code{\link{transform_gene_pathway}}
+\code{\link{compute_n1pas}}
 }
-}
-

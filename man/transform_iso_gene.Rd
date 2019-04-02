@@ -2,44 +2,35 @@
 % Please edit documentation in R/n1pas_method.R
 \name{transform_iso_gene}
 \alias{transform_iso_gene}
-\title{N-of-1-\emph{pathways} Mahalanobis distance (MD) Calculation}
+\title{Transforms gene-level distances into a pathway enrichment profiles}
 \usage{
 transform_iso_gene(gene_list, expr_threshold = 0, ...)
 }
 \arguments{
-\item{...}{Other arguments for stats::t.test.}
+\item{gene_list}{A list with length equal to the number of genes under consideration. List elements are matrices contaning the paired isoform expression for each gene. List elements are named using HUGO gene symbols.}
 
-\item{baseline}{A vector (paired with case) containing all gene expression}
+\item{expr_threshold}{A numeric value that specifies a low expression filter. The total gene count in each sample must be larger than this threshold. The default of 0 forces the gene to be expressed in both samples.}
 
-\item{case}{A vector (paired with baseline) containing all gene expression}
+\item{...}{Other arguments for n1pas functions}
 }
 \value{
-A list with the pathway_score (average MD score),
-direction (up or down relative to the baseline),
-and p_value. P_value is computed via a t.test.
+numeric. A vector of length equal to the number of genes contaning the gene-wise Hellinger distance.
 }
 \description{
-\code{compute_nof1_md} computes N-of-1-\emph{pathways} Mahalanobis distance (MD)
-statistic, direction, and P-value for a pathway (Schissler et al. 2015).
+\code{transform_iso_gene} transforms isoform counts into gene-wise Hellinger distances.
 }
 \details{
-This function enables gene set (pathway) testing for a single pathway while providing a context-meaningful effect size. In the original publication by Schissler et al. 2015, the P-value was produced via a nonparametric bootstrapping procedure. However, in later yet unpublished studies, it has been determined that a simple paired \emph{t}-test performs as well and much faster. Therefore the \emph{t}-test has been implemented. For a nonparametric approach use N-of-1-\emph{pathways} Wilcoxon for Gardeux et al. 2014.
-}
-\examples{
-## compute N-of-1-pathways MD for a single pathway
-set.seed(44)
-N <- 10
-gene1 <- stats::rchisq(N, 5)
-gene2 <- stats::rchisq(N, 5)
-md_res <- compute_nof1_md(gene1, gene2)
-print(md_res)
-
+This function is a wrapper to compute Hellinger distances for each gene. It first filters according to expressed genes (or a user-specified threshold).
 }
 \references{
+#' Efron, B. (2013). “Local False Discovery Rates,” in Large-Scale Inference doi:10.1017/cbo9780511761362.006
+
+Schissler, A. Grant, et al. "A single-subject method to detect pathway enriched with alternatively spliced genes." Frontiers in Genetics, to appear, (2019)
+
 Gardeux, Vincent, et al. "'N-of-1-\emph{pathways}' unveils personal deregulated mechanisms from a single pair of RNA-Seq samples: towards precision medicine." Journal of the American Medical Informatics Association 21.6 (2014): 1015-1025.
 
 Schissler, A. Grant, et al. "Dynamic changes of RNA-sequencing expression for precision medicine: N-of-1-\emph{pathways} Mahalanobis distance within pathways of single subjects predicts breast cancer survival." Bioinformatics 31.12 (2015): i293-i302.
 }
 \seealso{
-\code{link{compute_nof1_wilcoxon}}, \code{link{compute_nof1_pathways}}, \code{link{compute_multi_nof1_pathways}}
+\code{\link{compute_hellinger}} \code{\link{get_OR}} \code{link{transform_iso_gene}} \code{link{transform_gene_pathway}} \code{\link{blca_patient_iso_kegg}}
 }
