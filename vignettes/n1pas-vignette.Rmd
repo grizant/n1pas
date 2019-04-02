@@ -33,7 +33,7 @@ In this demonstration, we will apply <span style="color:purple">N-of-1-*pathways
 
 As the `nof1` package is not available on a public repository, the package must first be downloaded to a local destination. Then install using the following command (after updating with the system-specific path and version):
 
-`devtools::install_github("grizant/n1pas")`
+`devtools::install_github("grizant/n1pas", ref = "develop")`
 
 Be sure to employ the usual `library()` call in any data analysis scripts after installation.
 
@@ -80,8 +80,8 @@ Often, a clinician or researcher *a priori* selects pathways of interest to stud
 
 ```{r pathway_scores}
 ## Run and store Nof1-pathways Mahalanobis distance for the 4 pairs of data.
-annot_file <- file.path(my_path, "inst/extdata/kegg_tb.txt")
-desc_file <- file.path(my_path, "inst/extdata/kegg.description_tb.txt")
+annot_file <- file.path(my_path, "extdata/kegg_tb.txt")
+desc_file <- file.path(my_path, "extdata/kegg.description_tb.txt")
 iso_data <- blca_patient_iso_kegg
 
 enrichment_profile <- compute_n1pas(iso_data = iso_data, annot_file = annot_file, desc_file = desc_file, iso_range = c(2,30), genes_range = c(15,500), small_ontology = TRUE, plot_locfdr = 1)
