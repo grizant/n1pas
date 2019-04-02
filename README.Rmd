@@ -18,7 +18,7 @@ blah
 
 ## Overview
 
-```{r workflow_jpg, echo = F, out.width = 700, fig.retina = NULL}
+```{r workflow_jpg, echo = F, fig.retina = NULL}
 knitr::include_graphics("vignettes/workflow_diagram.jpg")
 ```
 
@@ -48,7 +48,6 @@ enrichment_profile <- compute_n1pas(iso_data = iso_data, annot_file = annot_file
 
 ## Explore the top five dysregulated pathways for the first patient.
 head(enrichment_profile, 15)
-## Store the top five pathways ID ("path_id") to compare to other patients.
 ```
 
 ## Getting help

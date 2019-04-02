@@ -12,7 +12,7 @@ blah
 
 ## Overview
 
-<img src="vignettes/workflow_diagram.jpg" title="plot of chunk workflow_jpg" alt="plot of chunk workflow_jpg" width="700" />
+![plot of chunk workflow_jpg](vignettes/workflow_diagram.jpg)
 
 ## Installation
 
@@ -95,7 +95,6 @@ head(enrichment_profile, 15)
 #> hsa04962 Vasopressin-regulated water reabsorption
 #> hsa03040                              Spliceosome
 #> hsa04530                           Tight junction
-## Store the top five pathways ID ("path_id") to compare to other patients.
 ```
 
 ## Getting help
