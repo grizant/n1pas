@@ -98,7 +98,7 @@ annot_file <- file.path(my_path,"inst/extdata/kegg_tb.txt")
 desc_file <- file.path(my_path,"inst/extdata/kegg.description_tb.txt")
 iso_data <- blca_patient_iso_kegg
 
-enrichment_profile <- compute_n1pas(iso_data = iso_data, annot_file = annot_file, desc_file = desc_file, iso_range = c(2,30), genes_range = c(15,500), small_ontology = TRUE)
+enrichment_profile <- compute_n1pas(iso_data = iso_data, annot_file = annot_file, desc_file = desc_file, iso_range = c(2,30), genes_range = c(15,500), small_ontology = TRUE, plot_locfdr = 1)
 
 ## Explore the top five dysregulated pathways for the first patient.
 head(enrichment_profile, 15)
