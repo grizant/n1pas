@@ -1,0 +1,17 @@
+citHeader("To cite n1pas in publications use:")
+
+citEntry(entry = "Article",
+  title = {"A single-subject method to detect pathways enriched with alternatively spliced genes"},
+  author= {"Schissler, Alfred Grant and Aberasturi, Dillon and Kenost, Colleen and Lussier, Yves A"},
+  journal={"Frontiers in Genetics"},
+  volume={"XX"},
+  number={"X"},
+  pages={"XXX--XXX"},
+  year={"2019"},
+  textVersion  = paste("AG Schissler et al. (2019)",
+  "A single-subject method to detect pathways enriched with alternatively spliced genes",
+  "Frontiers in Genetics XX.X, XXX-XXX.")
+)
+
+citFooter("We have invested a lot of time and effort in creating n1pas, please cite it.")
+
