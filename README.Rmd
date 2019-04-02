@@ -1,0 +1,62 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, echo = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "vignettes/"
+)
+```
+
+# n1pas
+
+blah
+
+## Overview
+
+```{r workflow_jpg, echo = F, out.width = 700, fig.retina = NULL}
+knitr::include_graphics("workflow_diagram.jpg")
+```
+
+## Installation
+
+```{r, eval = FALSE}
+## Install from github directly using the R package 'devtools'
+# install.packages("devtools")
+devtools::install_github("tidyverse/ggplot2", ref = "develop")
+```
+
+## Usage
+
+```{r example}
+library(n1pas)
+## Retrieve the library location to access files needed for this tutorial
+my_path <- find.package("n1pas")
+## Run and store Nof1-pathways Mahalanobis distance for the 4 pairs of data.
+annot_file <- file.path(my_path, "extdata/kegg_tb.txt")
+## annot_file <- file.path(my_path, "inst/extdata/kegg_tb.txt")
+desc_file <- file.path(my_path, "extdata/kegg.description_tb.txt")
+## desc_file <- file.path(my_path, "inst/extdata/kegg.description_tb.txt")
+
+iso_data <- blca_patient_iso_kegg
+
+enrichment_profile <- compute_n1pas(iso_data = iso_data, annot_file = annot_file, desc_file = desc_file, iso_range = c(2,30), genes_range = c(15,500), small_ontology = TRUE, plot_locfdr = 1)
+
+## Explore the top five dysregulated pathways for the first patient.
+head(enrichment_profile, 15)
+## Store the top five pathways ID ("path_id") to compare to other patients.
+```
+
+## Getting help
+
+There are two main places to get help with n1pas:
+
+1.  [Stack Overflow][so] is a great source of answers to common ggplot2
+    questions. It is also a great place to get help, once you have
+    created a reproducible example that illustrates your problem.
+	
+2.  Need help? Email the listserv mailing list nof1pathwayssupport@list.arizona.edu.
