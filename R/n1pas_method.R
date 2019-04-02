@@ -253,7 +253,7 @@ transform_gene_pathway <- function(gene_dist, annot_file, desc_file = NULL, gene
         if (small_ontology) {
             ## or use the small ontology customizations
             if (use_sd_mlests) {mlests <- c(1, sd(fil_odds))}
-            suppressWarnings(tmp_locfdr <- locfdr::locfdr(zz = fil_odds, bre = ceiling(length(fil_odds)/bre), df = df, pct = pct, pct0 = pct0, nulltype = nulltype, plot = plot, mlests = mlests))
+            suppressWarnings(tmp_locfdr <- locfdr::locfdr(zz = fil_odds, bre = ceiling(length(fil_odds)/bre), df = df, pct = pct, pct0 = pct0, nulltype = nulltype, plot = plot_locfdr, mlests = mlests))
         } else {
             ## or use the program defaults, suitable for large ontologies (> 1000)
             tmp_locfdr <- locfdr::locfdr(zz = fil_odds, plot = plot_locfdr)
@@ -275,7 +275,7 @@ transform_gene_pathway <- function(gene_dist, annot_file, desc_file = NULL, gene
     }
 
     ## 3. structure as a data frame
-    to_return <- data.frame(pathway_score = odds_ratio, direction = NA, fdr_value = 1, num_genes_annot = annot_lengths, num_genes_measured = measured_lengths, row.names = names(odds_ratio), upper_fdr_threshold = tmp_upper, diff_splice_call = tmp_call, stringsAsFactors = F)
+    to_return <- data.frame(pathway_score = odds_ratio, fdr_value = 1, num_genes_annot = annot_lengths, num_genes_measured = measured_lengths, row.names = names(odds_ratio), upper_fdr_threshold = tmp_upper, diff_splice_call = tmp_call, stringsAsFactors = F)
     ## add fdr_values
     to_return[names(fil_odds), "fdr_value"] <- tmp_locfdr$fdr
     ## and give p-value of 0 for outliers
