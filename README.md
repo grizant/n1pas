@@ -16,7 +16,7 @@ blah
 ```r
 ## Install from github directly using the R package 'devtools'
 # install.packages("devtools")
-devtools::install_github("tidyverse/ggplot2", ref = "develop")
+devtools::install_github("grizant/n1pas", ref = "develop")
 ```
 
 ## Usage
