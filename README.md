@@ -4,11 +4,15 @@
 
 # n1pas
 
-blah
+Welcome to the <span style="color:purple">N-of-1-*pathways*</span> Alternatively Spliced (N1PAS) R package github repo! Below is a short overview of the method, installation instructions, and basic usage. Each function included in the package has complete documentation for more details.
 
 ## Overview
 
+The software transforms a pair of isoform-level RNA-seq data sets from a individual subject to a personal profile of pathway enrichment of alternatively spliced genes. The schematic below illustrates the N1PAS workflow:
+
 ![plot of chunk workflow_jpg](vignettes/workflow_diagram.jpg)
+
+**Workflow of N1PAS**. A) Isoform-specific mRNA-Seq data are obtained from an individual. Gene-level distances between the two samples indicates the magnitude of alternative splicing. B) Gene-level distances are aggregated across the whole transcriptome and unsupervised clustering classifies genes as alternatively spliced genes (ASGs; blue) and not (red). The vertical axis shows the count of genes with Hellinger distances binned together to form the histogram. Note that since this is a univariate setting, 2-means simply finds a threshold Hellinger distance to classify the genes into two groups. Gene set (pathway) enrichment analysis is conducted by first C) computing the odds ratio (OR) to quantify the relative abundance of ASGs in the pathway versus genes not in the pathway (background). ORs are calculated for each pathway in the data-base to produce an empirical, subject-specific distribution (D). A local false discovery procedure provides uncertainty quantification (FDR) and classified pathways as enriched using a simple threshold at FDR < 20%. E) Results are tabulated to provide an individualized profile of alternative spliced enrichment.
 
 ## Installation
 
@@ -16,21 +20,40 @@ blah
 ```r
 ## Install from github directly using the R package 'devtools'
 # install.packages("devtools")
-devtools::install_github("grizant/n1pas", ref = "develop")
+devtools::install_github("grizant/n1pas")
 ```
 
 ## Usage
 
+Included with the package is one TCGA BLCA (Bladder cancer) patient's paired tumor-normal isoform RSEM counts.
+
+
+```r
+data(blca_patient_iso_kegg)
+## Display a few genes for the first two pairs of transcriptomes.
+head(blca_patient_iso_kegg)
+#>            geneSymbol TCGA-BL-A13J-N TCGA-BL-A13J-T
+#> uc002bgz.2      OR4F5         8.3372        15.9111
+#> uc003wfr.3     OR4F16        60.7593        76.1321
+#> uc011cbi.1      ISG15         0.0000         0.0000
+#> uc001jfy.3       AGRN         0.0000         0.0000
+#> uc001jji.2    B3GALT6         0.0000         0.0000
+#> uc002cyw.2     TAS1R3         0.0000         0.0000
+## Note that the rows are labeled by isoform ID
+```
+
+Note that the above RNA-seq data have been filtered to include only genes annotated the KEGG pathway database. Now we demostrate the basic usage of the main wrapper function `compute_n1pas` that completes the above workflow. Note that the mixture model fit in Panel D can be customized by passing `locfdr` specific parameters. For a small ontology, such as KEGG, custom parameters are provided. Simply set `small_ontology=TRUE` as in the example below. See the documentation via `?transform_gene_pathway` for more details.
+
 
 ```r
 library(n1pas)
+#> Welcome to the n1pas package!
+#> Need help? Email the listserv mailing list nof1pathwayssupport@list.arizona.edu
+#> Stackoverflow is a great place for general help: http://stackoverflow.com
 ## Retrieve the library location to access files needed for this tutorial
 my_path <- find.package("n1pas")
-## Run and store Nof1-pathways Mahalanobis distance for the 4 pairs of data.
 annot_file <- file.path(my_path, "extdata/kegg_tb.txt")
-## annot_file <- file.path(my_path, "inst/extdata/kegg_tb.txt")
 desc_file <- file.path(my_path, "extdata/kegg.description_tb.txt")
-## desc_file <- file.path(my_path, "inst/extdata/kegg.description_tb.txt")
 
 iso_data <- blca_patient_iso_kegg
 
@@ -95,10 +118,12 @@ head(enrichment_profile, 15)
 
 ## Getting help
 
-There are two main places to get help with n1pas:
+There are three main places to get help with n1pas:
 
-1.  [Stack Overflow][so] is a great source of answers to common ggplot2
+1.  Read the function specific documentation included with the package. Including ways to customize.
+
+2.  [Stack Overflow][so] is a great source of answers to common ggplot2
     questions. It is also a great place to get help, once you have
     created a reproducible example that illustrates your problem.
 	
-2.  Need help? Email the listserv mailing list nof1pathwayssupport@list.arizona.edu.
+3.  Need help? Email the listserv mailing list nof1pathwayssupport@list.arizona.edu.

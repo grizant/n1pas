@@ -10,33 +10,45 @@ knitr::opts_chunk$set(
 
 # n1pas
 
-blah
+Welcome to the <span style="color:purple">N-of-1-*pathways*</span> Alternatively Spliced (N1PAS) R package github repo! Below is a short overview of the method, installation instructions, and basic usage. Each function included in the package has complete documentation for more details.
 
 ## Overview
+
+The software transforms a pair of isoform-level RNA-seq data sets from a individual subject to a personal profile of pathway enrichment of alternatively spliced genes. The schematic below illustrates the N1PAS workflow:
 
 ```{r workflow_jpg, echo = F, fig.retina = NULL}
 knitr::include_graphics("vignettes/workflow_diagram.jpg")
 ```
+
+**Workflow of N1PAS**. A) Isoform-specific mRNA-Seq data are obtained from an individual. Gene-level distances between the two samples indicates the magnitude of alternative splicing. B) Gene-level distances are aggregated across the whole transcriptome and unsupervised clustering classifies genes as alternatively spliced genes (ASGs; blue) and not (red). The vertical axis shows the count of genes with Hellinger distances binned together to form the histogram. Note that since this is a univariate setting, 2-means simply finds a threshold Hellinger distance to classify the genes into two groups. Gene set (pathway) enrichment analysis is conducted by first C) computing the odds ratio (OR) to quantify the relative abundance of ASGs in the pathway versus genes not in the pathway (background). ORs are calculated for each pathway in the data-base to produce an empirical, subject-specific distribution (D). A local false discovery procedure provides uncertainty quantification (FDR) and classified pathways as enriched using a simple threshold at FDR < 20%. E) Results are tabulated to provide an individualized profile of alternative spliced enrichment.
 
 ## Installation
 
 ```{r, eval = FALSE}
 ## Install from github directly using the R package 'devtools'
 # install.packages("devtools")
-devtools::install_github("grizant/n1pas", ref = "develop")
+devtools::install_github("grizant/n1pas")
 ```
 
 ## Usage
+
+Included with the package is one TCGA BLCA (Bladder cancer) patient's paired tumor-normal isoform RSEM counts.
+
+```{r read_gene_expr}
+data(blca_patient_iso_kegg)
+## Display a few genes for the first two pairs of transcriptomes.
+head(blca_patient_iso_kegg)
+## Note that the rows are labeled by isoform ID
+```
+
+Note that the above RNA-seq data have been filtered to include only genes annotated the KEGG pathway database. Now we demostrate the basic usage of the main wrapper function `compute_n1pas` that completes the above workflow. Note that the mixture model fit in Panel D can be customized by passing `locfdr` specific parameters. For a small ontology, such as KEGG, custom parameters are provided. Simply set `small_ontology=TRUE` as in the example below. See the documentation via `?transform_gene_pathway` for more details.
 
 ```{r example}
 library(n1pas)
 ## Retrieve the library location to access files needed for this tutorial
 my_path <- find.package("n1pas")
-## Run and store Nof1-pathways Mahalanobis distance for the 4 pairs of data.
 annot_file <- file.path(my_path, "extdata/kegg_tb.txt")
-## annot_file <- file.path(my_path, "inst/extdata/kegg_tb.txt")
 desc_file <- file.path(my_path, "extdata/kegg.description_tb.txt")
-## desc_file <- file.path(my_path, "inst/extdata/kegg.description_tb.txt")
 
 iso_data <- blca_patient_iso_kegg
 
@@ -48,10 +60,12 @@ head(enrichment_profile, 15)
 
 ## Getting help
 
-There are two main places to get help with n1pas:
+There are three main places to get help with n1pas:
 
-1.  [Stack Overflow][so] is a great source of answers to common ggplot2
+1.  Read the function specific documentation included with the package. Including ways to customize.
+
+2.  [Stack Overflow][so] is a great source of answers to common ggplot2
     questions. It is also a great place to get help, once you have
     created a reproducible example that illustrates your problem.
 	
-2.  Need help? Email the listserv mailing list nof1pathwayssupport@list.arizona.edu.
+3.  Need help? Email the listserv mailing list nof1pathwayssupport@list.arizona.edu.
